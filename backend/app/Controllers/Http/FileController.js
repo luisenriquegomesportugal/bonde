@@ -1,8 +1,6 @@
 "use strict";
 
-/** @typedef {import('@adonisjs/framework/src/Request')} Request */
-/** @typedef {import('@adonisjs/framework/src/Response')} Response */
-
+const crypto = require("crypto");
 const File = use("App/Models/File");
 const Helpers = use("Helpers");
 
@@ -10,6 +8,26 @@ const Helpers = use("Helpers");
  * Resourceful controller for interacting with files
  */
 class FileController {
+  /**
+   * Show a file.
+   * GET files
+   *
+   * @param {object} ctx
+   * @param {Request} ctx.request
+   * @param {Response} ctx.response
+   */
+  async show({ params, response }) {
+    try {
+      const { file } = await File.findByOrFail("file", params.file);
+
+      return response.download(Helpers.tmpPath(`uploads/${file}`));
+    } catch (err) {
+      return response.status(err.status).send({
+        error: { message: "Algo não deu certo, esse arquivo existe?" }
+      });
+    }
+  }
+
   /**
    * Create/save a new file.
    * POST files
@@ -23,7 +41,9 @@ class FileController {
       if (!request.file("file")) return;
 
       const upload = request.file("file", { size: "2mb" });
-      const name = `${Date.now()}.${upload.subtype}`;
+      const name = `${Date.now()}_${crypto.randomBytes(15).toString("hex")}.${
+        upload.subtype
+      }`;
 
       await upload.move(Helpers.tmpPath("uploads"), { name });
 
