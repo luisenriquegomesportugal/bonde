@@ -4,18 +4,7 @@ const crypto = require("crypto");
 const File = use("App/Models/File");
 const Helpers = use("Helpers");
 
-/**
- * Resourceful controller for interacting with files
- */
 class FileController {
-  /**
-   * Show a file.
-   * GET files
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
   async show({ params, response }) {
     try {
       const { file } = await File.findByOrFail("file", params.file);
@@ -28,14 +17,6 @@ class FileController {
     }
   }
 
-  /**
-   * Create/save a new file.
-   * POST files
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
   async store({ request, response }) {
     try {
       if (!request.file("file")) return;
